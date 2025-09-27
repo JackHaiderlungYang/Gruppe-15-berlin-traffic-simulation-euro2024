@@ -4,8 +4,10 @@ import com.google.inject.Key;
 import com.google.inject.name.Names;
 import org.matsim.analysis.QsimTimingModule;
 import org.matsim.analysis.personMoney.PersonMoneyEventsAnalysisModule;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.application.MATSimApplication;
 import org.matsim.application.options.SampleOptions;
 import org.matsim.contrib.bicycle.BicycleConfigGroup;
@@ -35,6 +37,7 @@ import picocli.CommandLine;
 import playground.vsp.scoring.IncomeDependentUtilityOfMoneyPersonScoringParameters;
 
 import java.util.List;
+import java.util.Set;
 
 @CommandLine.Command(header = ":: Open Berlin Scenario ::", version = OpenBerlinScenario.VERSION, mixinStandardHelpOptions = true, showDefaultValues = true)
 public class OpenBerlinScenario extends MATSimApplication {
@@ -149,6 +152,47 @@ public class OpenBerlinScenario extends MATSimApplication {
 		// add hbefa link attributes.
 		HbefaRoadTypeMapping roadTypeMapping = OsmHbefaMapping.build();
 		roadTypeMapping.addHbefaMappings(scenario.getNetwork());
+
+		Set<Id<Link>> closedLinks = Set.of(
+			Id.createLinkId("-157390073#0"),
+			Id.createLinkId("1126200750#0"),
+			// Yitzhak-Rahin-Straße
+			Id.createLinkId("1094666589#1"),
+			Id.createLinkId("1094666589#3"),
+			Id.createLinkId("78298214#1"),
+			Id.createLinkId("206170874#0"),
+			Id.createLinkId("1094666587#2"),
+			Id.createLinkId("1094666587#3"),
+			Id.createLinkId("508779923#0"),
+			Id.createLinkId("335462891#0"),
+			Id.createLinkId("532727925#0"),
+			// Straße des 17. Juni
+			Id.createLinkId("894814132"),
+			Id.createLinkId("131577613#0"),
+			Id.createLinkId("320420916#0"),
+			Id.createLinkId("154041920"),
+			Id.createLinkId("320420912#0"),
+			Id.createLinkId("48859715#1"),
+			Id.createLinkId("320420913"),
+			Id.createLinkId("320420913#0"),
+			Id.createLinkId("154041909"),
+			Id.createLinkId("785302399"),
+			Id.createLinkId("154041912#0"),
+			Id.createLinkId("36259518"),
+			Id.createLinkId("909825435"),
+			Id.createLinkId("48859718#1"),
+			Id.createLinkId("710761408#0")
+			// Ebertstraße
+		);
+
+		for (Id<Link> linkId : closedLinks) {
+			Link link = scenario.getNetwork().getLinks().get(linkId);
+			if (link != null) {
+				link.setFreespeed(0.001);
+			} else {
+				System.out.println("WARNING: link not found: " + linkId);
+			}
+		}
 	}
 
 	@Override
